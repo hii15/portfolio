@@ -122,25 +122,6 @@ def apply_decision_logic(
         else:
             decision = "Maintain"
 
-<<<<<<< HEAD
-        if d7_roas > upper:
-            return (
-                "Scale Up",
-                f"d7_roas {d7_roas:.3f} > upper_bound {upper:.3f}",
-            )
-        if d7_roas < lower:
-            return (
-                "Scale Down",
-                f"d7_roas {d7_roas:.3f} < lower_bound {lower:.3f}",
-            )
-        return (
-            "Maintain",
-            f"lower_bound {lower:.3f} <= d7_roas {d7_roas:.3f} <= upper_bound {upper:.3f}",
-        )
-
-    decision_reason = out.apply(_decide_with_reason, axis=1)
-    out[["decision", "decision_reason"]] = pd.DataFrame(decision_reason.tolist(), index=out.index)
-=======
         # ── 상세 사유 / 액션 / 신뢰도 ──
         reason   = _rich_reason(decision, row, target_roas, lower, upper, min_installs)
         action   = _recommend_action(decision, row, target_roas)
@@ -157,7 +138,6 @@ def apply_decision_logic(
     out["action"]          = actions
     out["confidence"]      = conf_levels
     out["confidence_note"] = conf_reasons
->>>>>>> 2d90ef1 (update)
 
     if target_roas > 0:
         out["roas_gap_vs_target_pct"] = (out.get("d7_roas", 0) - target_roas) / target_roas * 100
