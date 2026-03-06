@@ -11,11 +11,7 @@ from data_processing.canonical_schema import (
     format_validation_issues,
     validate_canonical_bundle_detailed,
 )
-<<<<<<< HEAD
-from data_processing.metrics_engine import calculate_media_metrics, calculate_cohort_curve
-=======
 from data_processing.metrics_engine import calculate_media_metrics, calculate_cohort_curve, decompose_roas_change, check_cohort_maturity
->>>>>>> 2d90ef1 (update)
 from data_processing.decision_engine import apply_decision_logic
 from data_processing.liveops_analysis import compare_liveops_impact_by_level, derive_liveops_actions
 from data_processing.raw_templates import get_raw_template_bundle
@@ -33,22 +29,12 @@ st.caption("MMP 원본 데이터를 기반으로 UA 집행 판단 · 예산 배�
 # ─────────────────────────────────────────────
 # 상수
 # ─────────────────────────────────────────────
-<<<<<<< HEAD
-ANALYSIS_LEVEL_OPTIONS = ["media_source", "campaign", "adset", "creative", "campaign_adset"]
-ANALYSIS_LEVEL_LABELS = {
-    "media_source":   "매체",
-    "campaign":       "캠페인",
-    "adset":          "광고그룹",
-    "creative":       "소재",
-    "campaign_adset": "캠페인+광고그룹",
-=======
 ANALYSIS_LEVEL_OPTIONS = ["media_source", "campaign", "adset", "creative"]
 ANALYSIS_LEVEL_LABELS = {
     "media_source": "매체",
     "campaign":     "캠페인",
     "adset":        "광고그룹",
     "creative":     "소재",
->>>>>>> 2d90ef1 (update)
 }
 DECISION_LABEL_MAP = {
     "Scale Up":          "⬆️ 증액",
@@ -62,15 +48,6 @@ EFFICIENCY_NOTE_MAP = {
     "Efficiency risk":   "🔴 효율 저하",
     "Near target":       "🟡 목표 근접",
 }
-<<<<<<< HEAD
-DUMMY_SCENARIO_OPTIONS = [
-    (11, "시나리오 1 · 안정형 밸런스"),
-    (27, "시나리오 2 · 고효율 매체 강세"),
-    (42, "시나리오 3 · 기본 추천 시나리오"),
-    (58, "시나리오 4 · 저효율/보수 운영"),
-    (73, "시나리오 5 · 라이브옵스 반응 강화"),
-    (91, "시나리오 6 · 변동성 높은 혼합"),
-=======
 # (seed, label, phase)
 # phase: "launch" = 사전예약~런칭기 (7~10억/월), "sustain" = 유지기 (1.5~3억/월)
 DUMMY_SCENARIO_OPTIONS = [
@@ -80,7 +57,6 @@ DUMMY_SCENARIO_OPTIONS = [
     (58, "시나리오 4 · 유지기 · 효율 집중 운영",      "sustain"),
     (73, "시나리오 5 · 유지기 · 라이브옵스 반응 강화", "sustain"),
     (91, "시나리오 6 · 유지기 · 변동성 높은 혼합",    "sustain"),
->>>>>>> 2d90ef1 (update)
 ]
 DUMMY_LIVEOPS_START = "2026-01-15"
 DUMMY_LIVEOPS_END   = "2026-01-21"
@@ -93,11 +69,7 @@ DATA_STATE_KEYS     = ["canonical", "raw_bundle"]
 if "canonical" not in st.session_state:
     try:
         _mmp = "AppsFlyer"
-<<<<<<< HEAD
-        _i, _e, _c = get_mmp_raw_bundle(mmp=_mmp, seed=42)
-=======
         _i, _e, _c = get_mmp_raw_bundle(mmp=_mmp, seed=42, phase="launch")
->>>>>>> 2d90ef1 (update)
         _adapter   = ADAPTER_REGISTRY[_mmp]()
         _canonical = coerce_canonical_types(
             installs=_adapter.normalize_installs(_i),
@@ -159,10 +131,7 @@ def _friendly_decision_reason(reason: str) -> str:
 
 
 def _filter_by_period(installs: pd.DataFrame, period_days: int | None) -> pd.DataFrame:
-<<<<<<< HEAD
-=======
     """period_days 기반 필터 — 내부 호환용으로 유지."""
->>>>>>> 2d90ef1 (update)
     if period_days is None:
         return installs
     inst = installs.copy()
@@ -171,8 +140,6 @@ def _filter_by_period(installs: pd.DataFrame, period_days: int | None) -> pd.Dat
     return inst[inst["_d"] >= cutoff].drop(columns=["_d"])
 
 
-<<<<<<< HEAD
-=======
 def _filter_by_daterange(installs: pd.DataFrame, start_date, end_date) -> pd.DataFrame:
     """날짜 범위(date 객체) 기반 필터."""
     inst = installs.copy()
@@ -206,7 +173,6 @@ def _date_slider(installs: pd.DataFrame, key: str):
     return result[0], result[1]
 
 
->>>>>>> 2d90ef1 (update)
 def _style_decision_table(df: pd.DataFrame):
     def row_color(row):
         decision  = str(row.get("판단", ""))
@@ -234,8 +200,6 @@ def _style_decision_table(df: pd.DataFrame):
     )
 
 
-<<<<<<< HEAD
-=======
 def _show_data_period(canonical) -> None:
     """현재 로딩된 데이터의 기간을 작은 배지로 표시."""
     if canonical is None:
@@ -249,7 +213,6 @@ def _show_data_period(canonical) -> None:
         pass
 
 
->>>>>>> 2d90ef1 (update)
 # ─────────────────────────────────────────────
 # 예산 배분 계산 함수
 # ─────────────────────────────────────────────
@@ -351,35 +314,12 @@ with tab_upload:
     if st.session_state.get("_auto_loaded"):
         st.success("✅ 시나리오 3 기본 더미 데이터가 자동 로딩되었습니다. UA 판단 탭을 바로 확인해보세요!")
 
-<<<<<<< HEAD
-    mmp = st.selectbox("MMP 선택", ["AppsFlyer", "Adjust", "Singular"],
-                       key="upload_mmp",
-                       help="실제 데이터 업로드 시 사용 중인 MMP를 선택하세요. 더미 데이터 체험 시에는 무관합니다.")
-=======
     # 더미 데이터는 AppsFlyer 고정 (MMP 선택 불필요)
     _DUMMY_MMP = "AppsFlyer"
->>>>>>> 2d90ef1 (update)
 
     st.markdown("#### ⚡ 빠른 체험 — 더미 시나리오")
     st.caption("시드가 달라지면 매체 순위·성과가 완전히 달라집니다. 실무처럼 정해진 답이 없는 데이터입니다.")
 
-<<<<<<< HEAD
-    scenario_labels = [label for _, label in DUMMY_SCENARIO_OPTIONS]
-    label_to_seed   = {label: seed for seed, label in DUMMY_SCENARIO_OPTIONS}
-    q1, q2          = st.columns([1, 2])
-    selected_label  = q1.selectbox("시나리오 선택", scenario_labels, index=2, key="upload_scenario")
-    use_custom_seed = q1.checkbox("시드 직접 입력 (고급)", value=False, key="upload_custom_seed")
-    dummy_seed      = label_to_seed[selected_label]
-    if use_custom_seed:
-        dummy_seed = q1.number_input("시드 번호", min_value=0, value=int(dummy_seed), step=1, key="upload_seed_num")
-
-    if q2.button("더미 데이터 불러오기", use_container_width=True):
-        try:
-            _i, _e, _c  = get_mmp_raw_bundle(mmp=mmp, seed=int(dummy_seed))
-            _canonical  = _normalize_uploaded_data(mmp, _i, _e, _c)
-            _set_loaded_bundle(_canonical, {"mmp": mmp, "installs_raw": _i, "events_raw": _e, "cost_raw": _c})
-            st.success(f"{mmp} 더미 데이터 로드 완료 (시드: {int(dummy_seed)})")
-=======
     scenario_labels   = [label for _, label, _ in DUMMY_SCENARIO_OPTIONS]
     label_to_scenario = {label: (seed, phase) for seed, label, phase in DUMMY_SCENARIO_OPTIONS}
     q1, q2            = st.columns([1, 2])
@@ -398,41 +338,17 @@ with tab_upload:
             _set_loaded_bundle(_canonical, {"mmp": _DUMMY_MMP, "installs_raw": _i, "events_raw": _e, "cost_raw": _c})
             phase_label = "런칭기" if dummy_phase == "launch" else "유지기"
             st.success(f"더미 데이터 로드 완료 ({phase_label} · 시드: {int(dummy_seed)})")
->>>>>>> 2d90ef1 (update)
             st.session_state["_auto_loaded"] = False
         except Exception as exc:
             st.error("더미 데이터 로드 중 오류가 발생했습니다.")
             st.code(str(exc))
 
-<<<<<<< HEAD
-    with st.expander("업로드 오류 해결 가이드", expanded=False):
-        st.markdown("""
-- **E001/E005**: 데이터가 비어 있는 경우입니다. 파일에 실제 데이터 행이 있는지 확인해 주세요.
-- **E002/E006**: 시간 형식 오류입니다. `YYYY-MM-DD HH:MM:SS` 형태를 권장합니다.
-- **E003/E004/E007**: 컬럼 누락 오류입니다. 아래 템플릿을 참고해 주세요.
-""")
-
-    st.markdown("#### 📥 업로드 템플릿 다운로드")
-    t_i, t_e, t_c = get_raw_template_bundle(mmp)
-    tc1, tc2, tc3 = st.columns(3)
-    tc1.download_button("설치 템플릿 CSV",  data=_to_csv_bytes(t_i), file_name=f"{mmp.lower()}_installs_template.csv", mime="text/csv", use_container_width=True, key="dl_tpl_i")
-    tc2.download_button("이벤트 템플릿 CSV", data=_to_csv_bytes(t_e), file_name=f"{mmp.lower()}_events_template.csv",  mime="text/csv", use_container_width=True, key="dl_tpl_e")
-    tc3.download_button("비용 템플릿 CSV",  data=_to_csv_bytes(t_c), file_name=f"{mmp.lower()}_cost_template.csv",    mime="text/csv", use_container_width=True, key="dl_tpl_c")
-
-=======
->>>>>>> 2d90ef1 (update)
     if st.button("🗑️ 데이터 초기화"):
         for k in DATA_STATE_KEYS + ["_auto_loaded"]:
             st.session_state.pop(k, None)
         st.success("초기화 완료")
         st.rerun()
 
-<<<<<<< HEAD
-    st.markdown("#### 📤 직접 업로드")
-    uc1, uc2, uc3 = st.columns(3)
-    installs_file = uc1.file_uploader("설치 원본",       type=["csv", "xlsx"], key="installs")
-    events_file   = uc2.file_uploader("이벤트 원본",     type=["csv", "xlsx"], key="events")
-=======
     st.markdown("#### 📤 실제 데이터 업로드")
     st.caption("MMP에서 내보낸 Raw 데이터를 직접 업로드할 수 있습니다.")
 
@@ -468,7 +384,6 @@ with tab_upload:
     uc1, uc2, uc3 = st.columns(3)
     installs_file = uc1.file_uploader("설치 원본",        type=["csv", "xlsx"], key="installs")
     events_file   = uc2.file_uploader("이벤트 원본",      type=["csv", "xlsx"], key="events")
->>>>>>> 2d90ef1 (update)
     cost_file     = uc3.file_uploader("비용 원본 (선택)", type=["csv", "xlsx"], key="cost")
 
     if installs_file and events_file:
@@ -476,13 +391,8 @@ with tab_upload:
             _i = load_file(installs_file)
             _e = load_file(events_file)
             _c = load_file(cost_file) if cost_file else None
-<<<<<<< HEAD
-            _canonical = _normalize_uploaded_data(mmp, _i, _e, _c)
-            _set_loaded_bundle(_canonical, {"mmp": mmp, "installs_raw": _i, "events_raw": _e,
-=======
             _canonical = _normalize_uploaded_data(mmp_upload, _i, _e, _c)
             _set_loaded_bundle(_canonical, {"mmp": mmp_upload, "installs_raw": _i, "events_raw": _e,
->>>>>>> 2d90ef1 (update)
                                              "cost_raw": _c if _c is not None else pd.DataFrame()})
             st.success("정규화 완료")
             st.session_state["_auto_loaded"] = False
@@ -490,11 +400,7 @@ with tab_upload:
             st.error("데이터 정규화 중 오류가 발생했습니다.")
             st.code(str(exc))
     else:
-<<<<<<< HEAD
-        st.info("설치/이벤트 파일을 업로드하거나, 위의 더미 데이터 버튼을 눌러 주세요.")
-=======
         st.info("파일을 업로드하거나, 위의 더미 데이터 버튼을 눌러 주세요.")
->>>>>>> 2d90ef1 (update)
 
     canonical_preview = st.session_state.get("canonical")
     if canonical_preview is not None:
@@ -525,10 +431,7 @@ canonical = st.session_state.get("canonical")
 # ══════════════════════════════════════════════
 with tab_decision:
     st.subheader("UA 판단")
-<<<<<<< HEAD
-=======
     _show_data_period(st.session_state.get("canonical"))
->>>>>>> 2d90ef1 (update)
 
     if canonical is None:
         st.warning("먼저 데이터 업로드 탭에서 데이터를 불러와 주세요.")
@@ -545,19 +448,10 @@ with tab_decision:
 | **효율 상태** | 성과를 4단계로 요약 (효율 우수 / 목표 근접 / 효율 저하 / 표본 부족) |
 """)
 
-<<<<<<< HEAD
-        p1, p2, p3, p4 = st.columns(4)
-        decision_level = p1.selectbox("분석 레벨", ANALYSIS_LEVEL_OPTIONS, index=1, format_func=lambda x: ANALYSIS_LEVEL_LABELS[x], key="decision_level")
-        target_roas    = p2.number_input("목표 ROAS", min_value=0.0, value=1.0, step=0.05, key="decision_target_roas")
-        min_installs   = p3.number_input("최소 설치수 기준", min_value=1, value=200, step=10, key="decision_min_installs")
-        period_label   = p4.selectbox("분석 기간", ["최근 7일", "최근 14일", "최근 30일", "전체 기간"], index=2, key="decision_period")
-        period_days    = {"최근 7일": 7, "최근 14일": 14, "최근 30일": 30, "전체 기간": None}[period_label]
-=======
         p1, p2, p3 = st.columns(3)
         decision_level = p1.selectbox("분석 레벨", ANALYSIS_LEVEL_OPTIONS, index=1, format_func=lambda x: ANALYSIS_LEVEL_LABELS[x], key="decision_level")
         target_roas    = p2.number_input("목표 ROAS", min_value=0.0, value=1.0, step=0.05, key="decision_target_roas")
         min_installs   = p3.number_input("최소 설치수 기준", min_value=1, value=200, step=10, key="decision_min_installs")
->>>>>>> 2d90ef1 (update)
 
         # Geo 필터
         all_geos = sorted(canonical.installs["geo"].dropna().unique().tolist()) if "geo" in canonical.installs.columns else []
@@ -567,12 +461,8 @@ with tab_decision:
         else:
             filtered_installs = canonical.installs
 
-<<<<<<< HEAD
-        period_installs = _filter_by_period(filtered_installs, period_days)
-=======
         d_start, d_end  = _date_slider(filtered_installs, key="decision_daterange")
         period_installs = _filter_by_daterange(filtered_installs, d_start, d_end) if d_start else filtered_installs
->>>>>>> 2d90ef1 (update)
         if period_installs.empty:
             st.warning("선택한 기간에 데이터가 없습니다. 기간을 넓혀 주세요.")
         else:
@@ -617,15 +507,6 @@ with tab_decision:
 
             # 메인 테이블
             st.markdown("#### 🗂️ 세그먼트별 상세 판단")
-<<<<<<< HEAD
-            decision_view = decision_df.copy()
-            decision_view["decision"]        = decision_view["decision"].map(DECISION_LABEL_MAP).fillna(decision_view["decision"])
-            decision_view["decision_reason"] = decision_view["decision_reason"].apply(_friendly_decision_reason)
-            decision_view["efficiency_note"] = decision_view["efficiency_note"].apply(lambda x: EFFICIENCY_NOTE_MAP.get(str(x), str(x)))
-            decision_view = decision_view.rename(columns={
-                "decision":               "판단",
-                "decision_reason":        "판단 사유",
-=======
 
             CONFIDENCE_LABEL_MAP = {
                 "높음": "🟢 높음",
@@ -644,7 +525,6 @@ with tab_decision:
                 "action":                 "권장 액션",
                 "confidence":             "신뢰도",
                 "confidence_note":        "신뢰도 근거",
->>>>>>> 2d90ef1 (update)
                 "efficiency_note":        "효율 상태",
                 "roas_gap_vs_target_pct": "목표 대비 ROAS 차이(%)",
                 "install_gap_to_min":     "최소 설치수 대비 차이",
@@ -654,8 +534,6 @@ with tab_decision:
                                file_name="ua_decision_table.csv", mime="text/csv",
                                use_container_width=True, key="dl_decision")
 
-<<<<<<< HEAD
-=======
             # ── [NEW] 신뢰도 분포 요약 ──
             st.markdown("#### 🎯 신뢰도 분포")
             conf_counts = decision_df["confidence"].value_counts().to_dict()
@@ -768,17 +646,13 @@ with tab_decision:
             except Exception as _e:
                 st.info(f"ROAS 분해를 계산할 수 없습니다: {_e}")
 
->>>>>>> 2d90ef1 (update)
 
 # ══════════════════════════════════════════════
 # 탭 3 : 예산 배분 추천
 # ══════════════════════════════════════════════
 with tab_budget:
     st.subheader("💰 예산 배분 추천")
-<<<<<<< HEAD
-=======
     _show_data_period(st.session_state.get("canonical"))
->>>>>>> 2d90ef1 (update)
 
     if canonical is None:
         st.warning("먼저 데이터 업로드 탭에서 데이터를 불러와 주세요.")
@@ -797,19 +671,10 @@ with tab_budget:
 - 예산을 대폭 늘리면 오디언스 소진으로 실제 ROAS가 예상보다 낮아질 수 있습니다.
 """)
 
-<<<<<<< HEAD
-        b1, b2, b3 = st.columns(3)
-        total_budget       = b1.number_input("다음 달 총 예산 (원)", min_value=100_000, value=50_000_000, step=1_000_000, format="%d", key="budget_total")
-        budget_period_label= b2.selectbox("성과 참고 기간", ["최근 7일", "최근 14일", "최근 30일"], index=2, key="budget_period")
-        budget_period_days = {"최근 7일": 7, "최근 14일": 14, "최근 30일": 30}[budget_period_label]
-        exclude_sd         = b3.checkbox("감액 판단 매체 배분 제외", value=True, key="budget_exclude_sd",
-                                          help="UA 판단에서 감액 판정된 매체는 배분에서 제외합니다")
-=======
         b1, b2 = st.columns(2)
         total_budget = b1.number_input("다음 달 총 예산 (원)", min_value=100_000, value=50_000_000, step=1_000_000, format="%d", key="budget_total")
         exclude_sd   = b2.checkbox("감액 판단 매체 배분 제외", value=True, key="budget_exclude_sd",
                                     help="UA 판단에서 감액 판정된 매체는 배분에서 제외합니다")
->>>>>>> 2d90ef1 (update)
 
         # Geo 필터
         all_geos_b = sorted(canonical.installs["geo"].dropna().unique().tolist()) if "geo" in canonical.installs.columns else []
@@ -819,13 +684,9 @@ with tab_budget:
         else:
             budget_installs = canonical.installs
 
-<<<<<<< HEAD
-        period_installs_b = _filter_by_period(budget_installs, budget_period_days)
-=======
         b_start, b_end    = _date_slider(budget_installs, key="budget_daterange")
         period_installs_b = _filter_by_daterange(budget_installs, b_start, b_end) if b_start else budget_installs
         budget_period_days = (pd.Timestamp(b_end) - pd.Timestamp(b_start)).days + 1 if b_start else 30
->>>>>>> 2d90ef1 (update)
 
         # 감액 판단 참조용
         budget_metrics  = calculate_media_metrics(period_installs_b, canonical.events, canonical.cost, level="media_source")
@@ -877,28 +738,16 @@ with tab_budget:
 # ══════════════════════════════════════════════
 with tab_curve:
     st.subheader("코호트 곡선")
-<<<<<<< HEAD
-=======
     _show_data_period(st.session_state.get("canonical"))
->>>>>>> 2d90ef1 (update)
 
     if canonical is None:
         st.warning("먼저 데이터 업로드 탭에서 데이터를 불러와 주세요.")
     else:
         st.caption("D일 누적 LTV = 설치 후 D일 이내 누적 매출 ÷ 설치수")
 
-<<<<<<< HEAD
-        cu1, cu2 = st.columns([1, 1])
-        curve_level        = cu1.selectbox("분석 레벨", ANALYSIS_LEVEL_OPTIONS, index=0, format_func=lambda x: ANALYSIS_LEVEL_LABELS[x], key="curve_level")
-        curve_period_label = cu2.selectbox("기간", ["최근 7일", "최근 14일", "최근 30일", "전체"], index=2, key="curve_period")
-        curve_period_days  = {"최근 7일": 7, "최근 14일": 14, "최근 30일": 30, "전체": None}[curve_period_label]
-
-        curve_installs = _filter_by_period(canonical.installs, curve_period_days)
-=======
         curve_level = st.selectbox("분석 레벨", ANALYSIS_LEVEL_OPTIONS, index=0, format_func=lambda x: ANALYSIS_LEVEL_LABELS[x], key="curve_level")
         c_start, c_end = _date_slider(canonical.installs, key="curve_daterange")
         curve_installs = _filter_by_daterange(canonical.installs, c_start, c_end) if c_start else canonical.installs
->>>>>>> 2d90ef1 (update)
         curve          = calculate_cohort_curve(curve_installs, canonical.events, max_day=30, level=curve_level)
 
         if curve.empty:
@@ -931,10 +780,7 @@ with tab_curve:
 # ══════════════════════════════════════════════
 with tab_liveops:
     st.subheader("라이브옵스 영향")
-<<<<<<< HEAD
-=======
     _show_data_period(st.session_state.get("canonical"))
->>>>>>> 2d90ef1 (update)
 
     if canonical is None:
         st.warning("먼저 데이터 업로드 탭에서 데이터를 불러와 주세요.")
