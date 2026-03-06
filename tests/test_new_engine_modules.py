@@ -152,6 +152,7 @@ class NewEngineModulesTests(unittest.TestCase):
         self.assertTrue(out.empty)
 
 
+<<<<<<< HEAD
     def test_liveops_supports_campaign_adset_level(self):
         installs = pd.DataFrame(
             {
@@ -183,6 +184,8 @@ class NewEngineModulesTests(unittest.TestCase):
         self.assertIn("adset", out.columns)
         self.assertNotIn("media_source", out.columns)
 
+=======
+>>>>>>> 2d90ef1 (update)
     def test_liveops_impact_supports_level_breakdown(self):
         installs = pd.DataFrame(
             {
@@ -271,6 +274,7 @@ class NewEngineModulesTests(unittest.TestCase):
         self.assertAlmostEqual(float(out["spend"].sum()), 20000.0)
 
 
+<<<<<<< HEAD
     def test_metrics_support_campaign_adset_level(self):
         installs = pd.DataFrame(
             {
@@ -306,6 +310,8 @@ class NewEngineModulesTests(unittest.TestCase):
         self.assertIn("adset", out.columns)
         self.assertNotIn("media_source", out.columns)
 
+=======
+>>>>>>> 2d90ef1 (update)
     def test_cohort_curve_supports_creative_level(self):
         installs = pd.DataFrame(
             {

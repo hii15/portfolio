@@ -104,6 +104,46 @@ CREATIVE_BASE = [
         "arppu_mult_range":    (0.95, 1.15),
     },
 ]
+<<<<<<< HEAD
+
+
+def _sample_media_profiles(rng: np.random.Generator) -> dict:
+    """
+    시드 기반으로 매체별 실제 성과 파라미터를 범위 내에서 샘플링.
+    같은 시드 = 같은 결과 (재현성 보장), 다른 시드 = 다른 순위 구도.
+    """
+    profiles = {}
+    for media, spec in MEDIA_PROFILES.items():
+        profiles[media] = {
+            "cpi":           rng.uniform(*spec["cpi_range"]),
+            "purchase_rate": rng.uniform(*spec["purchase_rate_range"]),
+            "arppu":         rng.uniform(*spec["arppu_range"]),
+            "daily_install_range": spec["daily_install_range"],
+            "daily_volatility":    spec["daily_volatility"],
+            "campaigns":     spec["campaigns"],
+        }
+    return profiles
+
+
+def _sample_creative_profiles(rng: np.random.Generator) -> list:
+    """소재 성과 배율도 범위 내에서 샘플링."""
+    creatives = []
+    for base in CREATIVE_BASE:
+        share = rng.uniform(*base["install_share_range"])
+        creatives.append({
+            "suffix":        base["suffix"],
+            "install_share": share,
+            "purchase_mult": rng.uniform(*base["purchase_mult_range"]),
+            "arppu_mult":    rng.uniform(*base["arppu_mult_range"]),
+        })
+    # install_share 합이 1이 되도록 정규화
+    total = sum(c["install_share"] for c in creatives)
+    for c in creatives:
+        c["install_share"] /= total
+    return creatives
+
+=======
+>>>>>>> 2d90ef1 (update)
 
 
 def _sample_media_profiles(rng: np.random.Generator) -> dict:
@@ -142,8 +182,21 @@ def _sample_creative_profiles(rng: np.random.Generator) -> list:
     return creatives
 
 
-def generate_canonical_dummy_data(seed: int = 42):
+def generate_canonical_dummy_data(seed: int = 42, phase: str = "launch"):
+    """
+    phase 파라미터로 운영 단계별 예산 규모를 현실적으로 조정.
+    "launch"  (사전예약~런칭기): 7~10억/월 — 다수 매체 동시 집행, 물량 공세
+    "sustain" (유지기):          1.5~3억/월 — 효율 매체 중심, 보수적 운영
+    CPI·ROAS 등 효율 지표는 그대로 유지하고 절대 비용 규모만 달라짐.
+    """
     rng = np.random.default_rng(seed)
+
+    # 단계별 설치수 스케일 계수
+    if phase == "launch":
+        install_scale = rng.uniform(1.6, 2.0)   # 현재 대비 1.6~2.0배 → 월 7~10억
+    else:  # sustain
+        install_scale = rng.uniform(0.35, 0.55)  # 현재 대비 0.35~0.55배 → 월 1.5~3억
+
     start = pd.Timestamp("2026-01-01")
     days = 30
 
@@ -181,7 +234,11 @@ def generate_canonical_dummy_data(seed: int = 42):
                 campaign_mult = rng.uniform(0.90, 1.15)
 
                 lo, hi = profile["daily_install_range"]
+<<<<<<< HEAD
                 daily_installs = int(rng.integers(lo, hi))
+=======
+                daily_installs = int(rng.integers(lo, hi) * install_scale)
+>>>>>>> 2d90ef1 (update)
 
                 creative_installs = rng.multinomial(daily_installs, creative_probs)
                 campaign_user_keys = []
@@ -234,7 +291,17 @@ def generate_canonical_dummy_data(seed: int = 42):
                         rev_per_purchase = revenue_total / len(buyers)
 
                         for buyer in buyers:
+<<<<<<< HEAD
                             lag = int(rng.integers(0, 8))
+=======
+                            # 현실적인 구매 시점 분포:
+                            # - D1~D3 집중 (첫 인상이 강한 시기)
+                            # - D7~D14 2차 구매 (게임 진입 후 과금 결정)
+                            # - D15~D30 장기 잔존 과금
+                            # geometric 분포로 초반 집중 + 롱테일 구조 구현
+                            lag_base = int(rng.geometric(p=0.18)) - 1  # 평균 약 4.6일
+                            lag = min(lag_base, 29)  # 최대 29일 (D30까지 반영)
+>>>>>>> 2d90ef1 (update)
                             events_rows.append({
                                 "user_key":   buyer,
                                 "event_time": day + pd.Timedelta(days=lag, hours=int(rng.integers(0, 24))),
@@ -327,10 +394,10 @@ MMP_CONVERTERS = {
 }
 
 
-def get_mmp_raw_bundle(mmp: str, seed: int = 42) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def get_mmp_raw_bundle(mmp: str, seed: int = 42, phase: str = "launch") -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if mmp not in MMP_CONVERTERS:
         raise ValueError(f"Unsupported MMP: {mmp}")
-    installs, events, cost = generate_canonical_dummy_data(seed=seed)
+    installs, events, cost = generate_canonical_dummy_data(seed=seed, phase=phase)
     return MMP_CONVERTERS[mmp](installs, events, cost)
 
 

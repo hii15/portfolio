@@ -8,7 +8,10 @@ from data_processing.adapters import ADAPTER_REGISTRY
 from data_processing.canonical_schema import coerce_canonical_types
 from data_processing.metrics_engine import calculate_media_metrics
 from dummy_data.generate_dummy_data import write_mmp_dummy_data, get_mmp_raw_bundle, generate_canonical_dummy_data
+<<<<<<< HEAD
 from dummy_data.run_mmp_experiments import run_experiments
+=======
+>>>>>>> 2d90ef1 (update)
 
 
 class DummyMMPPipelineTests(unittest.TestCase):
@@ -88,6 +91,7 @@ class DummyMMPPipelineTests(unittest.TestCase):
                 self.assertGreater(len(metrics), 0)
                 self.assertIn("d7_roas", metrics.columns)
 
+<<<<<<< HEAD
     def test_experiment_report_outputs_files(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             data_root = f"{tmpdir}/dummy"
@@ -110,5 +114,7 @@ class DummyMMPPipelineTests(unittest.TestCase):
             self.assertIn("seed", report_txt)
 
 
+=======
+>>>>>>> 2d90ef1 (update)
 if __name__ == "__main__":
     unittest.main()
