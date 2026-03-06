@@ -104,46 +104,6 @@ CREATIVE_BASE = [
         "arppu_mult_range":    (0.95, 1.15),
     },
 ]
-<<<<<<< HEAD
-
-
-def _sample_media_profiles(rng: np.random.Generator) -> dict:
-    """
-    시드 기반으로 매체별 실제 성과 파라미터를 범위 내에서 샘플링.
-    같은 시드 = 같은 결과 (재현성 보장), 다른 시드 = 다른 순위 구도.
-    """
-    profiles = {}
-    for media, spec in MEDIA_PROFILES.items():
-        profiles[media] = {
-            "cpi":           rng.uniform(*spec["cpi_range"]),
-            "purchase_rate": rng.uniform(*spec["purchase_rate_range"]),
-            "arppu":         rng.uniform(*spec["arppu_range"]),
-            "daily_install_range": spec["daily_install_range"],
-            "daily_volatility":    spec["daily_volatility"],
-            "campaigns":     spec["campaigns"],
-        }
-    return profiles
-
-
-def _sample_creative_profiles(rng: np.random.Generator) -> list:
-    """소재 성과 배율도 범위 내에서 샘플링."""
-    creatives = []
-    for base in CREATIVE_BASE:
-        share = rng.uniform(*base["install_share_range"])
-        creatives.append({
-            "suffix":        base["suffix"],
-            "install_share": share,
-            "purchase_mult": rng.uniform(*base["purchase_mult_range"]),
-            "arppu_mult":    rng.uniform(*base["arppu_mult_range"]),
-        })
-    # install_share 합이 1이 되도록 정규화
-    total = sum(c["install_share"] for c in creatives)
-    for c in creatives:
-        c["install_share"] /= total
-    return creatives
-
-=======
->>>>>>> 2d90ef1 (update)
 
 
 def _sample_media_profiles(rng: np.random.Generator) -> dict:
@@ -234,11 +194,7 @@ def generate_canonical_dummy_data(seed: int = 42, phase: str = "launch"):
                 campaign_mult = rng.uniform(0.90, 1.15)
 
                 lo, hi = profile["daily_install_range"]
-<<<<<<< HEAD
-                daily_installs = int(rng.integers(lo, hi))
-=======
                 daily_installs = int(rng.integers(lo, hi) * install_scale)
->>>>>>> 2d90ef1 (update)
 
                 creative_installs = rng.multinomial(daily_installs, creative_probs)
                 campaign_user_keys = []
@@ -291,9 +247,6 @@ def generate_canonical_dummy_data(seed: int = 42, phase: str = "launch"):
                         rev_per_purchase = revenue_total / len(buyers)
 
                         for buyer in buyers:
-<<<<<<< HEAD
-                            lag = int(rng.integers(0, 8))
-=======
                             # 현실적인 구매 시점 분포:
                             # - D1~D3 집중 (첫 인상이 강한 시기)
                             # - D7~D14 2차 구매 (게임 진입 후 과금 결정)
@@ -301,7 +254,6 @@ def generate_canonical_dummy_data(seed: int = 42, phase: str = "launch"):
                             # geometric 분포로 초반 집중 + 롱테일 구조 구현
                             lag_base = int(rng.geometric(p=0.18)) - 1  # 평균 약 4.6일
                             lag = min(lag_base, 29)  # 최대 29일 (D30까지 반영)
->>>>>>> 2d90ef1 (update)
                             events_rows.append({
                                 "user_key":   buyer,
                                 "event_time": day + pd.Timedelta(days=lag, hours=int(rng.integers(0, 24))),
